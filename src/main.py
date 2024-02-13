@@ -8,13 +8,12 @@ from configuration import Configuration
 settings=""
 script_dir = os.path.dirname(os.path.realpath(__file__))
 
-def ClearProfile(posnumbers):
-    for pos in posnumbers:
-        profilePath = GetProfilePath(pos)
-        if os.path.exists(profilePath):
-            shutil.rmtree(profilePath)
+async def ClearProfile(pos):
+    profilePath = GetProfilePath(pos)
+    if os.path.exists(profilePath):
+        shutil.rmtree(profilePath)
 
-def CreateProfile(posnumbers):
+async def CreateProfile(posnumbers):
     for pos in posnumbers:
         profilePath = GetProfilePath(pos)
         if os.path.exists(profilePath):
@@ -27,13 +26,16 @@ async def main():
         settings = json.load(file)
     
     configuration = Configuration(**settings)
-    CreateProfile(configuration.posnumbers)
+    await CreateProfile(configuration.posnumbers)
 
     for pos in configuration.posnumbers:
         driver: Driver = Driver(GetProfilePath(pos), configuration)
-        async_tasks.append(asyncio.create_task(driver.RunBrowser(pos)))
+        task = asyncio.create_task(driver.RunBrowser(pos))
+        async_tasks.append(task)
     
-    await asyncio.gather(*async_tasks).add_done_callback(ClearProfile)
+    asyncio.wait(await asyncio.gather(*async_tasks), timeout=None, return_when=asyncio.ALL_COMPLETED)
+    
+    await ClearProfile(configuration.posnumbers)
 
 if __name__== "__main__":
     asyncio.run(main())

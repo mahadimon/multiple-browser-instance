@@ -1,4 +1,4 @@
-*.json
+src/*.json
 src/profile*
 src/__pycache__
 src/__pycache__/*

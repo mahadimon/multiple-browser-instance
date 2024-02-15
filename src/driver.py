@@ -5,6 +5,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from configuration import Configuration
 from util import GetActivationKey
 import asyncio
+from configuration import PosUser
 class Driver:
     def __init__(self, profilePath, configuration):
         self.profile = webdriver.ChromeOptions()
@@ -17,7 +18,7 @@ class Driver:
         await self.WelcomeLogin(posnumber)
         await self.PressConnect()
 
-    async def WelcomeLogin(self, posnumber):
+    async def WelcomeLogin(self, posuser):
         input_username_field = WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.XPATH, "//input[@id='userName']")))
         input_username_field.send_keys(self.configuration.username)
 
@@ -25,7 +26,7 @@ class Driver:
         input_password_field.send_keys(self.configuration.password)
 
         input_activation_key_field = WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.XPATH, "//input[@id='activationKey']")))
-        input_activation_key_field.send_keys(GetActivationKey(self.configuration.chainnumber, self.configuration.storenumber, posnumber))
+        input_activation_key_field.send_keys(GetActivationKey(self.configuration.chainnumber, self.configuration.storenumber, posuser.posnumber))
 
         press_connect_button = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.CLASS_NAME, "submit-button")))
         press_connect_button.click()
@@ -37,5 +38,16 @@ class Driver:
         press_connect.click()
         await asyncio.sleep(5)
 
+    async def CashierLogin(self, posuser: PosUser):
+        input_cashier_number = WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.XPATH, "//input[@data-placeholder='Cashier number']")))
+        input_cashier_number.send_keys(posuser.cashiernumber)
+
+        input_cashier_number = WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.XPATH, "//input[@data-placeholder='Password']")))
+        input_cashier_number.send_keys(posuser.cashierpassword)
+
+        press_continue_button = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable(By.XPATH, "//login-fields/button/span[1]"))
+        press_continue_button.click()
+
+        await asyncio.sleep(20)
 
     

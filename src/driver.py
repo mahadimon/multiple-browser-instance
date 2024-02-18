@@ -19,6 +19,8 @@ class Driver:
         await self.WelcomeLogin(posuser)
         await self.PressConnect()
         await self.CashierLogin(posuser)
+        await self.Sell5ArticleInJournal()
+        await self.PressCancelReceipt()
         await self.CashierLogOut()
 
     async def WelcomeLogin(self, posuser):
@@ -55,13 +57,77 @@ class Driver:
             press_continue_button = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//fiftytwo-login/login-fields/button")))
             press_continue_button.click()
 
-            await asyncio.sleep(20)
+            await asyncio.sleep(10)
+        except Exception as ex:
+            print(f"Unexpected: {ex}, {type(ex)=}")
+
+    async def Sell5ArticleInJournal(self):
+        try:
+            await self.PressKeyBoard()
+            # sell article 10
+            await self.PressButtonById(id='1')
+            await self.PressButtonById(id='0')
+            await self.PressButtonById(id='enter')
+            # sell article 11
+            await self.PressButtonById(id='1',pressCount=2)
+            await self.PressButtonById(id='enter')
+            # sell article 12
+            await self.PressButtonById(id='1')
+            await self.PressButtonById(id='2')
+            await self.PressButtonById(id='enter')
+            # sell article 100
+            await self.PressButtonById(id='1')
+            await self.PressButtonById(id='0')
+            await self.PressButtonById(id='0')
+            await self.PressButtonById(id='enter')
+            # sell article 200
+            await self.PressButtonById(id='2')
+            await self.PressButtonById(id='0')
+            await self.PressButtonById(id='0')
+            await self.PressButtonById(id='enter')
+            # return to journal screen
+            await self.PressBack()
+        except Exception as ex:
+            print(f"Unexpected: {ex}, {type(ex)=}")
+
+    async def PressCancelReceipt(self):
+        try:
+            press_keyboard_button = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//span[contains(text(), 'Cancel Receipt')]")))
+            press_keyboard_button.click()
+            await asyncio.sleep(2)
+        except Exception as ex:
+            print(f"Unexpected: {ex}, {type(ex)=}")
+
+    async def PressButtonById(self, id: str, pressCount: int=1):
+        try:
+            print("id---->"+id+"--count---->"+str(pressCount))
+            for i in range(pressCount):
+                press_enter_button = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.ID, id)))
+                press_enter_button.click()
+                #await asyncio.sleep(2)
+        except Exception as ex:
+            print(f"Unexpected: {ex}, {type(ex)=}")
+            exit
+
+    async def PressBack(self):
+        try:
+            press_keyboard_button = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//mat-icon[contains(text(), 'arrow_back')]")))
+            press_keyboard_button.click()
+            await asyncio.sleep(2)
+        except Exception as ex:
+            print(f"Unexpected: {ex}, {type(ex)=}")
+
+    async def PressKeyBoard(self):
+        try:
+            press_keyboard_button = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//mat-icon[contains(text(), 'keyboard')]")))
+            press_keyboard_button.click()
+            await asyncio.sleep(2)
         except Exception as ex:
             print(f"Unexpected: {ex}, {type(ex)=}")
 
     async def CashierLogOut(self):
         try:
-            press_menu_button = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//fiftytwo-icon/mat-icon[contains(text(), 'menu')]")))
+            press_menu_button = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//mat-icon[contains(text(), 'menu')]")))
             press_menu_button.click()
             await asyncio.sleep(10)
             press_sign_off_button = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//mat-icon[contains(text(), 'exit_to_app')]")))

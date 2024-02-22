@@ -27,9 +27,7 @@ async def main():
         settings = json.load(file)
     
     configuration = Configuration(**settings)
-    #print(configuration.posusers)
     configuration.posusers = [PosUser(**data) for data in configuration.posusers]
-    #print(configuration.posusers)
     await CreateProfile(configuration.posusers)
 
     for posuser in configuration.posusers:
